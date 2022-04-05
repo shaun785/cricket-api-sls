@@ -1,0 +1,56 @@
+service: nmo-catman-api-sls
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'local'}
+  region: ${opt:region, 'us-east-2'}
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    DIMENSIONS_TABLE: dimensions-${self:provider.stage}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DIMENSIONS_TABLE}"
+
+functions:
+  dimensions:
+    handler: src/functions/dimensions.handler
+    events:
+      - http:
+          method: "*"
+          path: dimensions
+          cors: true
+      - http:
+          method: "*"
+          path: dimensions/{type}
+          cors: true
+custom:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    exclude: ["aws-sdk"]
+    target: "node14"
+    define: { "require.resolve": undefined }
+    platform: "node"
+    concurrency: 10
+  dynamodb:
+    stages:
+      - local
+    start:
+      migrate: true
+
+resources: ${file(./template.yml)}
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+  - serverless-esbuild
