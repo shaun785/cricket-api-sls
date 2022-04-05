@@ -5,7 +5,7 @@ import {
   APIGatewayProxyResult,
 } from "aws-lambda";
 import formatJSONResponse from "../libs/formatJsonResponse";
-import { dimensionService } from "../libs/services";
+import { dimensionService } from "../libs/dynamodb";
 import middyfy from '../libs/middyfy';
 
 export const handler: Handler = middyfy(

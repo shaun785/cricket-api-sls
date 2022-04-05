@@ -9,7 +9,7 @@ class DimensionService {
 
   async getAllDimensions(): Promise<Dimension[]> {
     const result = await this.docClient
-      .scan({
+      .query({
         TableName: this.tableName,
       })
       .promise();

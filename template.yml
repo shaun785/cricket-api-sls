@@ -2,7 +2,7 @@ Resources:
   dimensionsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: dimensions
+      TableName: dimensions-${self:provider.stage}
       AttributeDefinitions:
         - AttributeName: dimType
           AttributeType: S
